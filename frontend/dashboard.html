@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – Campus Event Pro</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">Campus Event Pro</a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="calendar.html" class="nav-link">Calendar</a></li>
+        <li><a href="events.html" class="nav-link">Events</a></li>
+        <li><a href="dashboard.html" class="nav-link active">Dashboard</a></li>
+      </ul>
+      <div class="nav-actions"></div>
+    </div>
+  </nav>
+
+  <main class="container" id="dashboard-view" style="flex:1; margin-top:1.5rem;">
+    <!-- Welcome Header -->
+    <div class="dashboard-header">
+      <div class="welcome-card" style="width:100%;">
+        <img id="user-avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop" alt="User Avatar" class="user-avatar-lg" />
+        <div>
+          <h2 style="font-size:1.6rem;">Welcome back, <span id="user-name-display">User</span> 👋</h2>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-top:0.25rem;">
+            Role: <span id="user-role-badge" class="badge badge-tech">STUDENT</span> | Department: <span id="user-dept-display">Computer Science</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 Counter Widgets Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-info">
+          <h3 id="stat-total-events">0</h3>
+          <p>Total Campus Events</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🚀</div>
+        <div class="stat-info">
+          <h3 id="stat-upcoming-events">0</h3>
+          <p>Upcoming Events</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✨</div>
+        <div class="stat-info">
+          <h3 id="stat-todays-events">0</h3>
+          <p>Today's Events</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎟️</div>
+        <div class="stat-info">
+          <h3 id="stat-joined-events">0</h3>
+          <p>Total Registrations</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📱</div>
+        <div class="stat-info">
+          <h3 id="stat-qr-count">0</h3>
+          <p>QR Attendance Scans</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎓</div>
+        <div class="stat-info">
+          <h3 id="stat-certificates">0</h3>
+          <p>Certificates Earned</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart.js Visual Analytics Row -->
+    <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:1.5rem; margin-bottom:2rem;">
+      <div class="glass-card">
+        <h3>📈 Monthly Event Registration Trend</h3>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Total student sign-ups across academic terms</p>
+        <div style="height:260px; position:relative;">
+          <canvas id="chart-monthly-registrations"></canvas>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <h3>🏢 Department-wise Distribution</h3>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Event distribution by academic department</p>
+        <div style="height:260px; position:relative; display:flex; align-items:center; justify-content:center;">
+          <canvas id="chart-department-events"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Main Grid Split -->
+    <div class="dashboard-grid">
+      <div>
+        <div class="section-title">
+          <h3>🎟️ Your Registered Tickets & Entry QRs</h3>
+          <a href="events.html" class="btn btn-outline btn-sm">+ Browse Events</a>
+        </div>
+        <div id="joined-events-list">
+          <div class="glass-card" style="text-align:center; padding:2rem;">Loading your tickets...</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">
+          <h3>⚡ Recent Activity Feed</h3>
+        </div>
+        <div id="activity-feed-container">
+          <div class="glass-card" style="padding:1rem;">
+            <div class="ticket-item" style="margin-bottom:0.5rem;">
+              <div class="ticket-info">
+                <h4>System Initialized</h4>
+                <p>Campus Event Pro SaaS active & synchronized</p>
+              </div>
+            </div>
+            <div class="ticket-item">
+              <div class="ticket-info">
+                <h4>Master Calendar Live</h4>
+                <p>Updated with latest academic schedules</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-bottom">
+      &copy; 2026 Campus Event Pro Engine.
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

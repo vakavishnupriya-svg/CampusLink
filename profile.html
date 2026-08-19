@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile – Campus Event Pro</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">Campus Event Pro</a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="calendar.html" class="nav-link">Calendar</a></li>
+        <li><a href="events.html" class="nav-link">Events</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+      </ul>
+      <div class="nav-actions"></div>
+    </div>
+  </nav>
+
+  <main class="container" style="margin:2.5rem auto; flex:1;">
+    <div style="display:grid; grid-template-columns:1fr 2fr; gap:2rem;">
+      <aside class="glass-card" style="text-align:center;">
+        <img id="profile-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop" class="user-avatar-lg" style="margin:0 auto 1rem; width:110px; height:110px;" />
+        <h2 id="profile-name">User Name</h2>
+        <p id="profile-role" class="badge badge-tech" style="margin:0.5rem 0 1rem;">STUDENT</p>
+        <p id="profile-dept" style="color:var(--text-muted); font-size:0.9rem; margin-bottom:0.25rem;"></p>
+        <p id="profile-roll" style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.5rem;"></p>
+        <button id="edit-profile-btn" class="btn btn-outline btn-sm" style="width:100%;">Edit Profile Info</button>
+      </aside>
+
+      <section>
+        <div class="glass-card" style="margin-bottom:2rem;">
+          <h3>🎓 Earned Certificates of Participation</h3>
+          <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.25rem;">Download official signed PDF certificates for attended events.</p>
+          <div id="certificates-list">
+            <div style="text-align:center; padding:1.5rem; color:var(--text-muted);">Loading certificates...</div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <h3>⚙️ Update Profile Details</h3>
+          <form id="profile-form" style="margin-top:1rem;">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="edit-name" name="full_name" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bio / Statement</label>
+              <textarea id="edit-bio" name="bio" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = APIClient.getUser();
+      if (!user) {
+        window.location.href = '/frontend/login.html';
+        return;
+      }
+
+      document.getElementById('profile-name').textContent = user.full_name;
+      document.getElementById('profile-role').textContent = user.role.toUpperCase();
+      document.getElementById('profile-dept').textContent = `Department: ${user.department}`;
+      document.getElementById('profile-roll').textContent = `ID / Roll: ${user.roll_number || 'N/A'}`;
+      document.getElementById('edit-name').value = user.full_name;
+      document.getElementById('edit-bio').value = user.bio || '';
+      if (user.avatar_url) document.getElementById('profile-avatar').src = user.avatar_url;
+
+      // Load Certificates
+      try {
+        const certs = await APIClient.request('/api/certificates');
+        const certContainer = document.getElementById('certificates-list');
+
+        if (certs.length === 0) {
+          certContainer.innerHTML = `<p style="color:var(--text-muted); font-size:0.9rem;">No certificates issued yet. Attend registered events to earn certificates!</p>`;
+        } else {
+          certContainer.innerHTML = certs.map(c => `
+            <div class="ticket-item">
+              <div class="ticket-info">
+                <h4>${c.event_title}</h4>
+                <p>📜 Certificate ID: <b>${c.certificate_number}</b> | Issued: ${new Date(c.issued_at).toLocaleDateString()}</p>
+              </div>
+              <a href="${API_BASE_URL}${c.download_url}" target="_blank" class="btn btn-primary btn-sm">Download PDF</a>
+            </div>
+          `).join('');
+        }
+      } catch (e) {
+        document.getElementById('certificates-list').innerHTML = `<p style="color:var(--text-muted);">No certificates records found.</p>`;
+      }
+
+      // Handle Profile Form
+      document.getElementById('profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+          const updated = await APIClient.request('/api/users/profile', {
+            method: 'PUT',
+            body: JSON.stringify({
+              full_name: document.getElementById('edit-name').value,
+              bio: document.getElementById('edit-bio').value
+            })
+          });
+          APIClient.setUser(updated);
+          APIClient.showToast('Profile details updated!', 'success');
+          setTimeout(() => location.reload(), 600);
+        } catch (err) {
+          APIClient.showToast(err.message, 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

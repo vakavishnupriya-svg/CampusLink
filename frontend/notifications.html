@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications – Campus Event Pro</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">Campus Event Pro</a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="calendar.html" class="nav-link">Calendar</a></li>
+        <li><a href="events.html" class="nav-link">Events</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+      </ul>
+      <div class="nav-actions"></div>
+    </div>
+  </nav>
+
+  <main class="container" style="max-width:800px; margin:2.5rem auto; flex:1;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+      <h2 style="font-size:1.75rem;">🔔 Notification Center</h2>
+      <button id="mark-all-read-btn" class="btn btn-secondary btn-sm">Mark All as Read</button>
+    </div>
+
+    <div id="notifications-list">
+      <div class="glass-card" style="text-align:center; padding:2rem;">Loading notifications...</div>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+</body>
+</html>

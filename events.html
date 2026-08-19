@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events Catalog – Campus Event Pro</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/events.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">Campus Event Pro</a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="calendar.html" class="nav-link">Calendar</a></li>
+        <li><a href="events.html" class="nav-link active">Events</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+      </ul>
+      <div class="nav-actions"></div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <header class="events-hero" style="padding:2rem 0 1.5rem;">
+      <h1 class="text-gradient" style="font-size:2.5rem; margin-bottom:0.5rem;">Campus Events Directory</h1>
+      <p style="color:var(--text-muted);">Explore, filter, and register for workshops, hackathons, and cultural fests.</p>
+    </header>
+
+    <!-- Smart Live Search & Multi-Filter Bar -->
+    <div class="search-filter-bar">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" class="form-control" placeholder="Search by title, speaker, or venue..." />
+      </div>
+
+      <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+        <select id="filter-category" class="form-control" style="width:auto;">
+          <option value="All">All Categories</option>
+          <option value="Hackathon">Hackathon</option>
+          <option value="Cultural">Cultural</option>
+          <option value="Technical">Technical</option>
+          <option value="Sports">Sports</option>
+          <option value="Workshop">Workshop</option>
+          <option value="Placement">Placement</option>
+          <option value="Seminar">Seminar</option>
+        </select>
+
+        <select id="filter-department" class="form-control" style="width:auto;">
+          <option value="All">All Departments</option>
+          <option value="Computer Science">Computer Science</option>
+          <option value="Information Technology">Information Technology</option>
+          <option value="Placement Cell">Placement Cell</option>
+          <option value="Cultural Club">Cultural Club</option>
+          <option value="Physical Education">Physical Education</option>
+        </select>
+
+        <select id="filter-sort" class="form-control" style="width:auto;">
+          <option value="newest">Sort: Newest</option>
+          <option value="popular">Sort: Most Popular</option>
+          <option value="closest">Sort: Closest Date</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Events Grid -->
+    <div id="events-grid-catalog" class="events-grid">
+      <!-- Loaded dynamically by events.js -->
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/registration.js"></script>
+  <script src="js/events.js"></script>
+</body>
+</html>

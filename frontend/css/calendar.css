@@ -1,0 +1,122 @@
+/* Campus Event Pro - Calendar CSS */
+
+.calendar-page-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.calendar-sidebar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.view-switcher {
+  display: flex;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: var(--radius-md);
+  padding: 0.25rem;
+  border: 1px solid var(--border-color);
+}
+
+.view-btn {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.view-btn.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.calendar-day-head {
+  background: rgba(30, 41, 59, 0.9);
+  padding: 0.75rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.calendar-cell {
+  background: var(--bg-card);
+  min-height: 110px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: var(--transition);
+}
+
+.calendar-cell:hover {
+  background: var(--bg-card-hover);
+}
+
+.calendar-cell.other-month {
+  opacity: 0.35;
+}
+
+.calendar-cell.today {
+  border: 2px solid var(--primary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.cell-date {
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.calendar-event-pill {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.calendar-event-pill:hover {
+  transform: scale(1.02);
+  filter: brightness(1.15);
+}
+
+.event-cat-Hackathon { background: #f59e0b; }
+.event-cat-Cultural { background: #ec4899; }
+.event-cat-Technical { background: #3b82f6; }
+.event-cat-Sports { background: #10b981; }
+.event-cat-Workshop { background: #8b5cf6; }
+.event-cat-Placement { background: #0ea5e9; }
+.event-cat-Seminar { background: #64748b; }

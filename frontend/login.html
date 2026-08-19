@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In – Campus Event Pro</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">Campus Event Pro</a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="events.html" class="nav-link">Events</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h2>Welcome Back</h2>
+        <p>Log in to access your internal calendar, tickets & certificates</p>
+      </div>
+
+      <!-- Quick Demo Login Shortcuts -->
+      <div style="background:rgba(99, 102, 241, 0.1); border:1px solid var(--border-glow); padding:0.75rem; border-radius:var(--radius-md); margin-bottom:1.5rem; text-align:center;">
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.5rem;"><b>Quick Demo Auto-Fill:</b></p>
+        <div style="display:flex; gap:0.5rem; justify-content:center;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('student@campuseventpro.edu', 'student123')">Student</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('faculty@campuseventpro.edu', 'faculty123')">Faculty</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('admin@campuseventpro.edu', 'admin123')">Admin</button>
+        </div>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email Address</label>
+          <input type="email" id="login-email" name="email" class="form-control" placeholder="name@campuseventpro.edu" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <input type="password" id="login-password" name="password" class="form-control" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:1rem;">Sign In</button>
+      </form>
+
+      <p class="auth-footer-text">
+        Don't have an account? <a href="register.html">Create Student/Faculty Account</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    function quickFill(email, password) {
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-password').value = password;
+      APIClient.showToast(`Auto-filled ${email} credentials!`, 'info');
+    }
+  </script>
+</body>
+</html>

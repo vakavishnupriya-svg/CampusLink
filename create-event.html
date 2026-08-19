@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Event – Campus Event Pro</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    .drag-drop-zone {
+      border: 2px dashed var(--primary);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      text-align: center;
+      background: rgba(99, 102, 241, 0.05);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .drag-drop-zone:hover, .drag-drop-zone.dragover {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--secondary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">Campus Event Pro</a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="calendar.html" class="nav-link">Calendar</a></li>
+        <li><a href="events.html" class="nav-link">Events</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+      </ul>
+      <div class="nav-actions"></div>
+    </div>
+  </nav>
+
+  <main class="container" style="max-width:850px; margin:2.5rem auto;">
+    <div class="glass-card">
+      <h2 style="font-size:1.8rem; margin-bottom:0.5rem;" class="text-gradient">✨ Create & Publish Campus Event</h2>
+      <p style="color:var(--text-muted); margin-bottom:2rem; font-size:0.9rem;">Faculty & Administrators can publish events directly to the master internal calendar.</p>
+
+      <form id="create-event-form">
+        <div class="form-group">
+          <label class="form-label" for="event-title">Event Title *</label>
+          <input type="text" id="event-title" name="title" class="form-control" placeholder="e.g. AI Robotics Workshop 2026" required />
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="event-cat">Category *</label>
+            <select id="event-cat" name="category" class="form-control" required>
+              <option value="Technical">Technical</option>
+              <option value="Cultural">Cultural</option>
+              <option value="Sports">Sports</option>
+              <option value="Workshop">Workshop</option>
+              <option value="Hackathon">Hackathon</option>
+              <option value="Placement">Placement</option>
+              <option value="Seminar">Seminar</option>
+              <option value="Club Activity">Club Activity</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="event-dept">Department / Organizer *</label>
+            <select id="event-dept" name="department" class="form-control" required>
+              <option value="Computer Science">Computer Science</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Mechanical Engineering">Mechanical Engineering</option>
+              <option value="Electrical Engineering">Electrical Engineering</option>
+              <option value="Placement Cell">Placement Cell</option>
+              <option value="Cultural Club">Cultural Club</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="event-desc">Full Event Description *</label>
+          <textarea id="event-desc" name="description" class="form-control" rows="4" placeholder="Provide detailed agenda, prerequisites, and speaker background..." required></textarea>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="event-venue">Venue / Room Number *</label>
+            <input type="text" id="event-venue" name="venue" class="form-control" placeholder="e.g. Main Auditorium Hall B" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="event-capacity">Total Capacity (Seats) *</label>
+            <input type="number" id="event-capacity" name="capacity" class="form-control" value="100" min="10" required />
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="event-start">Start Date & Time *</label>
+            <input type="datetime-local" id="event-start" name="start_time" class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="event-end">End Date & Time *</label>
+            <input type="datetime-local" id="event-end" name="end_time" class="form-control" required />
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="event-deadline">Registration Deadline *</label>
+            <input type="datetime-local" id="event-deadline" name="registration_deadline" class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="event-status">Initial Status</label>
+            <select id="event-status" name="status" class="form-control">
+              <option value="approved">Published</option>
+              <option value="pending">Draft</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="event-speaker">Keynote Speaker Name</label>
+            <input type="text" id="event-speaker" name="speaker_name" class="form-control" placeholder="e.g. Dr. Jane Smith" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="event-speaker-title">Speaker Designation</label>
+            <input type="text" id="event-speaker-title" name="speaker_title" class="form-control" placeholder="e.g. Principal AI Scientist" />
+          </div>
+        </div>
+
+        <!-- Drag and Drop Image Upload Box -->
+        <div class="form-group">
+          <label class="form-label">Event Banner Image</label>
+          <div id="drop-zone" class="drag-drop-zone">
+            <p style="font-size:1.2rem; margin-bottom:0.5rem;">📁 Drag & Drop Event Poster Image Here</p>
+            <p style="font-size:0.85rem; color:var(--text-muted);">or paste Image URL below</p>
+          </div>
+          <input type="url" id="event-banner" name="banner_url" class="form-control" style="margin-top:0.75rem;" placeholder="https://images.unsplash.com/photo-..." />
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2rem;">
+          <button type="reset" class="btn btn-secondary">Reset Form</button>
+          <div style="display:flex; gap:0.75rem;">
+            <button type="button" class="btn btn-outline" onclick="submitEventForm('pending')">Save Draft</button>
+            <button type="submit" class="btn btn-primary">🚀 Publish Event</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = APIClient.getUser();
+      if (!user || (user.role !== 'faculty' && user.role !== 'admin')) {
+        APIClient.showToast('Faculty or Admin privileges required to publish events', 'error');
+        setTimeout(() => window.location.href = 'events.html', 1200);
+        return;
+      }
+
+      const dropZone = document.getElementById('drop-zone');
+      dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        document.getElementById('event-banner').value = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1000&auto=format&fit=crop";
+        APIClient.showToast('Image uploaded successfully!', 'success');
+      });
+
+      FormValidator.bindValidation(document.getElementById('create-event-form'), async (formData) => {
+        await submitEventForm(formData.status || 'approved');
+      });
+    });
+
+    async function submitEventForm(statusVal) {
+      const title = document.getElementById('event-title').value;
+      const description = document.getElementById('event-desc').value;
+      const category = document.getElementById('event-cat').value;
+      const department = document.getElementById('event-dept').value;
+      const venue = document.getElementById('event-venue').value;
+      const capacity = document.getElementById('event-capacity').value;
+      const start_time = document.getElementById('event-start').value;
+      const end_time = document.getElementById('event-end').value;
+      const registration_deadline = document.getElementById('event-deadline').value;
+
+      if (!title || !description || !venue || !start_time || !end_time || !registration_deadline) {
+        APIClient.showToast('Please fill out all required fields marked with *', 'error');
+        return;
+      }
+
+      try {
+        const payload = {
+          title,
+          description,
+          category,
+          department,
+          venue,
+          start_time: new Date(start_time).toISOString(),
+          end_time: new Date(end_time).toISOString(),
+          registration_deadline: new Date(registration_deadline).toISOString(),
+          capacity: parseInt(capacity),
+          speaker_name: document.getElementById('event-speaker').value || '',
+          speaker_title: document.getElementById('event-speaker-title').value || '',
+          banner_url: document.getElementById('event-banner').value || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1000&auto=format&fit=crop'
+        };
+
+        const res = await APIClient.request('/api/events', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        APIClient.showToast('Event published! Saved to SQLite database & master calendar updated.', 'success');
+        setTimeout(() => {
+          window.location.href = `event-details.html?id=${res.id}`;
+        }, 800);
+      } catch (err) {
+        APIClient.showToast(err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>

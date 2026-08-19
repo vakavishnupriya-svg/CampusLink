@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Details – Campus Event Pro</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/events.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">Campus Event Pro</a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="calendar.html" class="nav-link">Calendar</a></li>
+        <li><a href="events.html" class="nav-link">Events</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+      </ul>
+      <div class="nav-actions"></div>
+    </div>
+  </nav>
+
+  <main class="container" style="margin:2rem auto;">
+    <div id="event-details-content">
+      <div class="glass-card" style="text-align:center; padding:3rem;">
+        <p style="color:var(--text-muted);">Loading event information...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Detailed Student Registration Form Modal -->
+  <div id="reg-form-modal" class="modal-overlay">
+    <div class="modal-container" style="max-width:560px;">
+      <div class="modal-header">
+        <h3>📝 Student Event Registration Form</h3>
+        <button class="modal-close" onclick="closeRegFormModal()">&times;</button>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.25rem;">Complete your student registration details to receive your entry QR ticket.</p>
+
+      <form id="student-reg-form">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="reg-fullname" class="form-control" placeholder="e.g. Alex Rivera" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Roll Number *</label>
+            <input type="text" id="reg-rollno" class="form-control" placeholder="e.g. CS2026-089" required />
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="form-group">
+            <label class="form-label">Email ID *</label>
+            <input type="email" id="reg-email" class="form-control" placeholder="alex@campuseventpro.edu" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number (10 Digits) *</label>
+            <input type="tel" id="reg-phone" class="form-control" placeholder="9876543210" pattern="[0-9]{10}" required />
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Department *</label>
+            <select id="reg-dept" class="form-control" required>
+              <option value="Computer Science">Computer Science</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Mechanical Engineering">Mechanical Engineering</option>
+              <option value="Electrical Engineering">Electrical Engineering</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Year *</label>
+            <select id="reg-year" class="form-control" required>
+              <option value="1st Year">1st Year</option>
+              <option value="2nd Year">2nd Year</option>
+              <option value="3rd Year" selected>3rd Year</option>
+              <option value="4th Year">4th Year</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Section *</label>
+            <select id="reg-sec" class="form-control" required>
+              <option value="Sec A" selected>Sec A</option>
+              <option value="Sec B">Sec B</option>
+              <option value="Sec C">Sec C</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1.5rem;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeRegFormModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Confirm Registration & Get Ticket</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- QR Ticket Modal -->
+  <div id="ticket-modal" class="modal-overlay">
+    <div class="modal-container" style="text-align:center;">
+      <div class="modal-header">
+        <h3>🎟️ Entry Ticket QR Code</h3>
+        <button class="modal-close" onclick="closeTicketModal()">&times;</button>
+      </div>
+      <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem;">Present this QR ticket at the venue gate for instant check-in.</p>
+      <p id="qr-ticket-regid" class="badge badge-tech" style="margin-bottom:1rem;"></p>
+      <img id="qr-ticket-img" src="" alt="QR Ticket Code" style="width:220px; height:220px; margin:0 auto 1.25rem; border:4px solid var(--primary); border-radius:var(--radius-md);" />
+      <p id="qr-ticket-token" style="font-family:monospace; font-weight:700; font-size:1.1rem; color:var(--secondary); margin-bottom:1.5rem;"></p>
+      <button class="btn btn-primary" onclick="closeTicketModal()">Done / Saved</button>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/registration.js"></script>
+  <script>
+    let currentEvent = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const eventId = urlParams.get('id');
+
+      if (!eventId) {
+        window.location.href = 'events.html';
+        return;
+      }
+
+      try {
+        currentEvent = await APIClient.request(`/api/events/${eventId}`);
+        renderEventDetails(currentEvent);
+      } catch (err) {
+        document.getElementById('event-details-content').innerHTML = `
+          <div class="glass-card" style="text-align:center; padding:3rem;">
+            <h2>Event Not Found</h2>
+            <a href="events.html" class="btn btn-primary" style="margin-top:1rem;">Back to Events</a>
+          </div>
+        `;
+      }
+    });
+
+    function renderEventDetails(ev) {
+      const fillPercent = Math.min(100, Math.round((ev.seats_taken / ev.capacity) * 100));
+      const remainingSeats = Math.max(0, ev.capacity - ev.seats_taken);
+
+      const html = `
+        <div style="margin-bottom:2rem;">
+          <img src="${ev.banner_url || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1000&auto=format&fit=crop'}" alt="${ev.title}" style="width:100%; height:360px; object-fit:cover; border-radius:var(--radius-lg);" />
+        </div>
+
+        <div style="display:grid; grid-template-columns:2fr 1fr; gap:2rem;">
+          <div class="glass-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+              <span class="badge badge-${ev.category.toLowerCase()}">${ev.category}</span>
+              <span style="color:var(--text-muted); font-size:0.9rem;">Organized by <b>${ev.organizer_name}</b></span>
+            </div>
+            <h1 style="font-size:2.2rem; margin-bottom:1rem;">${ev.title}</h1>
+            <p style="font-size:1rem; line-height:1.7; color:var(--text-muted); margin-bottom:2rem;">${ev.description}</p>
+
+            ${ev.speaker_name ? `
+              <div style="background:rgba(99, 102, 241, 0.1); border:1px solid var(--border-glow); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:2rem;">
+                <h4 style="color:var(--primary); margin-bottom:0.35rem;">🎙️ Keynote Speaker</h4>
+                <p style="font-weight:700; font-size:1.1rem;">${ev.speaker_name}</p>
+                <p style="color:var(--text-muted); font-size:0.9rem;">${ev.speaker_title || ''}</p>
+              </div>
+            ` : ''}
+
+            <h3 style="margin-bottom:1rem;">📍 Location & Venue Map</h3>
+            <div style="background:rgba(15,23,42,0.6); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1.5rem; text-align:center; color:var(--text-muted);">
+              <p style="font-size:1.1rem; color:var(--text-main); font-weight:600; margin-bottom:0.5rem;">${ev.venue}</p>
+              <p style="font-size:0.85rem;">Interactive Campus Navigation Map Active</p>
+            </div>
+          </div>
+
+          <aside class="glass-card" style="height:fit-content;">
+            <h3 style="margin-bottom:1rem;">Event Registration</h3>
+            <div style="font-size:0.9rem; color:var(--text-muted); display:flex; flex-direction:column; gap:0.75rem; margin-bottom:1.5rem;">
+              <div>📅 <b>Start:</b> ${new Date(ev.start_time).toLocaleString()}</div>
+              <div>⏰ <b>End:</b> ${new Date(ev.end_time).toLocaleString()}</div>
+              <div>⏳ <b>Deadline:</b> ${new Date(ev.registration_deadline).toLocaleDateString()}</div>
+              <div>🏫 <b>Department:</b> ${ev.department}</div>
+              ${ev.coordinator_name ? `<div>👨‍🏫 <b>Teacher Coordinator:</b> ${ev.coordinator_name} (${ev.coordinator_department || ev.department})</div>` : ''}
+            </div>
+
+            <div style="margin-bottom:1.5rem;">
+              <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:0.35rem;">
+                <span>Registered Students</span>
+                <span><b>${ev.seats_taken}</b> / ${ev.capacity} (${remainingSeats} Remaining)</span>
+              </div>
+              <div class="progress-bar-track" style="height:8px;">
+                <div class="progress-bar-fill" style="width:${fillPercent}%;"></div>
+              </div>
+            </div>
+
+            <div id="action-btn-container">
+              ${ev.is_user_registered ? `
+                <button onclick="showTicketModal()" class="btn btn-primary" style="width:100%; margin-bottom:0.75rem;">🎟️ View QR Entry Ticket</button>
+                <button onclick="leaveEvent()" class="btn btn-outline btn-sm" style="width:100%;">Unregister from Event</button>
+              ` : `
+                <button id="btn-register-${ev.id}" onclick="openRegistrationModal(${ev.id}, \`${ev.title.replace(/`/g, '\\`')}\`)" class="btn btn-primary" style="width:100%;">Register Now & Get Ticket</button>
+              `}
+            </div>
+          </aside>
+        </div>
+      `;
+      document.getElementById('event-details-content').innerHTML = html;
+    }
+
+    function openRegistrationModal() {
+      const user = APIClient.getUser();
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      document.getElementById('reg-fullname').value = user.full_name || '';
+      document.getElementById('reg-rollno').value = user.roll_number || 'CS2026-001';
+      document.getElementById('reg-email').value = user.email || '';
+      document.getElementById('reg-dept').value = user.department || 'Computer Science';
+      
+      document.getElementById('reg-form-modal').classList.add('active');
+    }
+
+    function closeRegFormModal() {
+      document.getElementById('reg-form-modal').classList.remove('active');
+    }
+
+    document.getElementById('student-reg-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const full_name = document.getElementById('reg-fullname').value.trim();
+      const roll_no = document.getElementById('reg-rollno').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const department = document.getElementById('reg-dept').value;
+      const year = document.getElementById('reg-year').value;
+      const section = document.getElementById('reg-sec').value;
+
+      if (phone.length !== 10 || isNaN(phone)) {
+        APIClient.showToast('Phone number must contain exactly 10 digits', 'error');
+        return;
+      }
+
+      try {
+        const payload = { full_name, roll_no, email, phone, department, year, section };
+        const res = await APIClient.request(`/api/events/${currentEvent.id}/register`, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        closeRegFormModal();
+        APIClient.showToast(`Registration Successful! Reg ID: ${res.registration_id}`, 'success');
+
+        document.getElementById('qr-ticket-regid').textContent = res.registration_id;
+        document.getElementById('qr-ticket-img').src = `${API_BASE_URL}${res.qr_code_url}`;
+        document.getElementById('qr-ticket-token').textContent = res.qr_code_token;
+        document.getElementById('ticket-modal').classList.add('active');
+
+        currentEvent.is_user_registered = true;
+        currentEvent.seats_taken += 1;
+        renderEventDetails(currentEvent);
+      } catch (err) {
+        APIClient.showToast(err.message, 'error');
+      }
+    });
+
+    async function leaveEvent() {
+      try {
+        await APIClient.request(`/api/events/${currentEvent.id}/unregister`, { method: 'POST' });
+        APIClient.showToast('Unregistered from event', 'info');
+        currentEvent.is_user_registered = false;
+        currentEvent.seats_taken = Math.max(0, currentEvent.seats_taken - 1);
+        renderEventDetails(currentEvent);
+      } catch (err) {
+        APIClient.showToast(err.message, 'error');
+      }
+    }
+
+    function showTicketModal() {
+      APIClient.request(`/api/events/${currentEvent.id}/register`, { method: 'POST' }).then(res => {
+        document.getElementById('qr-ticket-regid').textContent = res.registration_id;
+        document.getElementById('qr-ticket-img').src = `${API_BASE_URL}${res.qr_code_url}`;
+        document.getElementById('qr-ticket-token').textContent = res.qr_code_token;
+        document.getElementById('ticket-modal').classList.add('active');
+      });
+    }
+
+    function closeTicketModal() {
+      document.getElementById('ticket-modal').classList.remove('active');
+    }
+  </script>
+</body>
+</html>

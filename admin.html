@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel – Campus Event Pro</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .admin-sidebar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .admin-tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: left;
+    }
+    .admin-tab-btn.active, .admin-tab-btn:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .phone-btn {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid var(--border-glow);
+      color: var(--primary);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .phone-btn:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+    .badge-approved { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+    .badge-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+    .badge-rejected { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">Campus Event Pro</a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="calendar.html" class="nav-link">Calendar</a></li>
+        <li><a href="events.html" class="nav-link">Events</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        <li><a href="admin.html" class="nav-link active">Admin Portal</a></li>
+      </ul>
+      <div class="nav-actions"></div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="admin-layout">
+      <!-- Admin Sidebar -->
+      <aside class="admin-sidebar">
+        <h3 style="font-size:1.1rem; margin-bottom:0.75rem; color:var(--text-main);">🛡️ Admin Panel</h3>
+        <button class="admin-tab-btn active" onclick="switchAdminTab('tab-dashboard', this)">📊 Dashboard</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('tab-events', this)">📅 Events CRUD</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('tab-teachers', this)">👨‍🏫 Teacher Coordinators</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('tab-users', this)">👥 Students & Users</button>
+        <a href="admin-registrations.html" class="admin-tab-btn" style="text-decoration:none;">📋 Registrations</a>
+        <button class="admin-tab-btn" onclick="switchAdminTab('tab-attendance', this)">📱 QR Check-in</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('tab-reports', this)">📄 Export Reports</button>
+      </aside>
+
+      <!-- Main Admin Content Area -->
+      <section>
+        <!-- Tab 1: Analytics Dashboard -->
+        <div id="tab-dashboard" class="tab-content active">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+            <h2>System Overview & Analytics</h2>
+            <a id="export-btn-top" href="#" class="btn btn-primary btn-sm">📊 Export System CSV</a>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">👥</div>
+              <div class="stat-info">
+                <h3 id="admin-total-users">0</h3>
+                <p>Total Registered Users</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📅</div>
+              <div class="stat-info">
+                <h3 id="admin-total-events">0</h3>
+                <p>Total Events</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🎟️</div>
+              <div class="stat-info">
+                <h3 id="admin-registrations">0</h3>
+                <p>Total Sign-ups</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📈</div>
+              <div class="stat-info">
+                <h3 id="admin-attendance-rate">0%</h3>
+                <p>Attendance Rate</p>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; margin-top:1.5rem;">
+            <div class="glass-card">
+              <h3>Monthly Attendance Trend</h3>
+              <div style="height:240px; position:relative;">
+                <canvas id="admin-attendance-chart"></canvas>
+              </div>
+            </div>
+            <div class="glass-card">
+              <h3>Category Pie Breakdown</h3>
+              <div style="height:240px; position:relative; display:flex; align-items:center; justify-content:center;">
+                <canvas id="admin-category-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Events Management CRUD & Coordinator Assignment -->
+        <div id="tab-events" class="tab-content">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+            <h2>Manage Campus Events & Assign Coordinators</h2>
+            <a href="create-event.html" class="btn btn-primary btn-sm">+ Publish New Event</a>
+          </div>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Department</th>
+                  <th>Coordinator</th>
+                  <th>Venue</th>
+                  <th>Seats</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-events-tbody">
+                <tr><td colspan="8" style="text-align:center;">Loading events...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 3: Teacher Coordinators Management -->
+        <div id="tab-teachers" class="tab-content">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+            <h2>👨‍🏫 Teacher Coordinators (Approve & Assign)</h2>
+            <input type="text" id="teacher-search-input" class="form-control" style="max-width:280px;" placeholder="Search Teacher Name, Emp ID, Dept..." />
+          </div>
+
+          <div class="glass-card">
+            <div class="admin-table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Employee ID</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Department</th>
+                    <th>Assigned Event</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="teachers-table-body">
+                  <tr><td colspan="9" style="text-align:center; padding:2rem;">Loading teacher coordinators...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Students Directory -->
+        <div id="tab-users" class="tab-content">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+            <h2>👥 Students Directory</h2>
+            <input type="text" id="user-search-input" class="form-control" style="max-width:280px;" placeholder="Search Name, Phone, Roll No, Email..." />
+          </div>
+
+          <div class="glass-card">
+            <div class="admin-table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Roll No</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Role</th>
+                    <th>Department</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body">
+                  <tr><td colspan="8" style="text-align:center; padding:2rem;">Loading directory...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 5: QR Check-in Terminal -->
+        <div id="tab-attendance" class="tab-content">
+          <h2 style="margin-bottom:1rem;">📱 QR Attendance Terminal</h2>
+          <div class="glass-card" style="max-width:550px;">
+            <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1.5rem;">Scan or enter student QR Ticket token to mark attendance & generate PDF Certificate.</p>
+            <div class="form-group">
+              <label class="form-label">Select Event</label>
+              <select id="qr-event-select" class="form-control"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">QR Code Token</label>
+              <input type="text" id="qr-token-input" class="form-control" placeholder="e.g. CEP-A1B2C3D4E5F6" />
+            </div>
+            <button onclick="submitQrCheckin()" class="btn btn-primary" style="width:100%; margin-top:1rem;">Mark Attendance & Issue Cert</button>
+          </div>
+        </div>
+
+        <!-- Tab 6: Export Reports -->
+        <div id="tab-reports" class="tab-content">
+          <h2 style="margin-bottom:1.5rem;">📄 System Reports & Exports</h2>
+          <div class="glass-card">
+            <h4>Export Master Registrations Report (Roll No, Email, Phone, Dept, Attendance)</h4>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.25rem;">Download full student database export including 10-digit mobile numbers and Roll Numbers.</p>
+            <a id="export-btn-tab" href="#" class="btn btn-primary">Download CSV Report</a>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    let adminUsersList = [];
+    let teacherCoordinatorsList = [];
+    let adminEventsList = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = APIClient.getUser();
+      if (!user || user.role !== 'admin') {
+        APIClient.showToast('Admin privileges required', 'error');
+        setTimeout(() => window.location.href = 'dashboard.html', 1000);
+        return;
+      }
+
+      const exportUrl = `${API_BASE_URL}/api/admin/registrations/export`;
+      document.getElementById('export-btn-top').href = exportUrl;
+      document.getElementById('export-btn-tab').href = exportUrl;
+
+      setupUserSearch();
+      setupTeacherSearch();
+      await loadAdminDashboard();
+      await loadAdminEvents();
+      await loadAdminTeachers();
+      await loadAdminUsers();
+    });
+
+    function setupUserSearch() {
+      document.getElementById('user-search-input')?.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const filtered = adminUsersList.filter(u => 
+          (u.full_name && u.full_name.toLowerCase().includes(query)) ||
+          (u.email && u.email.toLowerCase().includes(query)) ||
+          (u.roll_number && u.roll_number.toLowerCase().includes(query)) ||
+          (u.phone && u.phone.toLowerCase().includes(query))
+        );
+        renderUsersTable(filtered);
+      });
+    }
+
+    function setupTeacherSearch() {
+      document.getElementById('teacher-search-input')?.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const filtered = teacherCoordinatorsList.filter(t => 
+          (t.name && t.name.toLowerCase().includes(query)) ||
+          (t.employee_id && t.employee_id.toLowerCase().includes(query)) ||
+          (t.email && t.email.toLowerCase().includes(query)) ||
+          (t.department && t.department.toLowerCase().includes(query))
+        );
+        renderTeachersTable(filtered);
+      });
+    }
+
+    function switchAdminTab(tabId, btn) {
+      document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    async function loadAdminDashboard() {
+      try {
+        const analytics = await APIClient.request('/api/admin/analytics');
+        document.getElementById('admin-total-users').textContent = analytics.total_users;
+        document.getElementById('admin-total-events').textContent = analytics.total_events;
+        document.getElementById('admin-registrations').textContent = analytics.total_registrations;
+        document.getElementById('admin-attendance-rate').textContent = `${analytics.attendance_rate}%`;
+
+        const ctxAttendance = document.getElementById('admin-attendance-chart')?.getContext('2d');
+        if (ctxAttendance && typeof Chart !== 'undefined') {
+          new Chart(ctxAttendance, {
+            type: 'line',
+            data: {
+              labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+              datasets: [{
+                label: 'Check-in Rate %',
+                data: [82, 88, 91, 89, 94, 92, 96, 99],
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                fill: true,
+                tension: 0.3
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+          });
+        }
+
+        const ctxCat = document.getElementById('admin-category-chart')?.getContext('2d');
+        if (ctxCat && typeof Chart !== 'undefined') {
+          new Chart(ctxCat, {
+            type: 'pie',
+            data: {
+              labels: analytics.category_distribution.map(c => c.category),
+              datasets: [{
+                data: analytics.category_distribution.map(c => c.count),
+                backgroundColor: ['#6366f1', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6']
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+          });
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadAdminEvents() {
+      adminEventsList = await APIClient.request('/api/events');
+      const tbody = document.getElementById('admin-events-tbody');
+      const select = document.getElementById('qr-event-select');
+      
+      select.innerHTML = adminEventsList.map(e => `<option value="${e.id}">${e.title}</option>`).join('');
+
+      tbody.innerHTML = adminEventsList.map(e => {
+        const coordDisplay = e.coordinator_name 
+          ? `<span style="font-weight:600; color:#10b981;">👤 ${e.coordinator_name}</span><br/><small style="color:var(--text-muted);">${e.coordinator_department || ''}</small>`
+          : `<button onclick="promptAssignCoordinator(${e.id})" class="btn btn-secondary btn-sm">+ Assign Coordinator</button>`;
+
+        return `
+          <tr>
+            <td>#${e.id}</td>
+            <td><b>${e.title}</b></td>
+            <td><span class="badge badge-${e.category.toLowerCase()}">${e.category}</span></td>
+            <td>${e.department}</td>
+            <td>${coordDisplay}</td>
+            <td>${e.venue}</td>
+            <td>${e.seats_taken}/${e.capacity}</td>
+            <td>
+              <a href="event-details.html?id=${e.id}" class="btn btn-secondary btn-sm">View</a>
+              <button onclick="promptAssignCoordinator(${e.id})" class="btn btn-secondary btn-sm" title="Change Coordinator">🔄 Assign</button>
+              <button onclick="deleteAdminEvent(${e.id})" class="btn btn-danger btn-sm">Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function loadAdminTeachers() {
+      try {
+        teacherCoordinatorsList = await APIClient.request('/api/admin/teachers');
+        renderTeachersTable(teacherCoordinatorsList);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderTeachersTable(teachers) {
+      const tbody = document.getElementById('teachers-table-body');
+      if (!teachers || teachers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--text-muted);">No Teacher Coordinators found</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = teachers.map(t => {
+        const statusBadge = t.status === 'approved' 
+          ? `<span class="badge badge-approved">Approved</span>`
+          : (t.status === 'pending' ? `<span class="badge badge-pending">Pending Approval</span>` : `<span class="badge badge-rejected">Rejected</span>`);
+
+        const assignedTitle = t.assigned_event_title ? `📅 <b>${t.assigned_event_title}</b>` : `<span style="color:var(--text-muted);">None</span>`;
+
+        let actionBtns = '';
+        if (t.status === 'pending') {
+          actionBtns += `<button onclick="updateTeacherStatus(${t.id}, 'approved')" class="btn btn-primary btn-sm" style="background:#10b981; border:none;">Approve</button> `;
+          actionBtns += `<button onclick="updateTeacherStatus(${t.id}, 'rejected')" class="btn btn-danger btn-sm">Reject</button> `;
+        } else if (t.status === 'approved') {
+          actionBtns += `<button onclick="updateTeacherStatus(${t.id}, 'pending')" class="btn btn-secondary btn-sm">Set Pending</button> `;
+        } else {
+          actionBtns += `<button onclick="updateTeacherStatus(${t.id}, 'approved')" class="btn btn-primary btn-sm">Re-Approve</button> `;
+        }
+        actionBtns += `<button onclick="deleteTeacher(${t.id})" class="btn btn-danger btn-sm">Delete</button>`;
+
+        return `
+          <tr>
+            <td>#${t.id}</td>
+            <td><b>${t.name}</b></td>
+            <td><span class="badge badge-tech">${t.employee_id}</span></td>
+            <td>${t.email}</td>
+            <td>📞 ${t.phone}</td>
+            <td>${t.department}</td>
+            <td>${assignedTitle}</td>
+            <td>${statusBadge}</td>
+            <td>${actionBtns}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function updateTeacherStatus(teacherId, status) {
+      try {
+        await APIClient.request(`/api/admin/teachers/${teacherId}/status`, {
+          method: 'PUT',
+          body: JSON.stringify({ status })
+        });
+        APIClient.showToast(`Teacher status updated to ${status}`, 'success');
+        await loadAdminTeachers();
+        await loadAdminEvents();
+      } catch (err) {
+        APIClient.showToast(err.message, 'error');
+      }
+    }
+
+    async function deleteTeacher(teacherId) {
+      if (!confirm('Delete this Teacher Coordinator account?')) return;
+      try {
+        await APIClient.request(`/api/admin/teachers/${teacherId}`, { method: 'DELETE' });
+        APIClient.showToast('Teacher Coordinator deleted', 'info');
+        await loadAdminTeachers();
+        await loadAdminEvents();
+      } catch (err) {
+        APIClient.showToast(err.message, 'error');
+      }
+    }
+
+    async function promptAssignCoordinator(eventId) {
+      const approvedTeachers = teacherCoordinatorsList.filter(t => t.status === 'approved');
+      if (approvedTeachers.length === 0) {
+        APIClient.showToast('No approved Teacher Coordinators available. Please approve a teacher first.', 'error');
+        return;
+      }
+
+      let teacherOptions = approvedTeachers.map(t => `${t.id}: ${t.name} (${t.department} - ${t.employee_id})`).join('\n');
+      let chosenInput = prompt(`Select Teacher Coordinator ID for Event #${eventId}:\n\n${teacherOptions}\n\nEnter ID (or 0 to unassign):`);
+      
+      if (chosenInput === null) return;
+      let teacherId = parseInt(chosenInput);
+      if (isNaN(teacherId)) return;
+
+      try {
+        await APIClient.request(`/api/admin/events/${eventId}/assign-coordinator`, {
+          method: 'PUT',
+          body: JSON.stringify({ coordinator_id: teacherId === 0 ? null : teacherId })
+        });
+        APIClient.showToast('Event coordinator assigned successfully!', 'success');
+        await loadAdminEvents();
+        await loadAdminTeachers();
+      } catch (err) {
+        APIClient.showToast(err.message, 'error');
+      }
+    }
+
+    async function loadAdminUsers() {
+      adminUsersList = await APIClient.request('/api/admin/users');
+      renderUsersTable(adminUsersList);
+    }
+
+    function renderUsersTable(users) {
+      const tbody = document.getElementById('users-table-body');
+      if (users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--text-muted);">No matching users found</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = users.map(u => {
+        const rollNo = u.roll_number || `CSEIOT230${u.id + 40}`;
+        const phone = u.phone || "+91 9876543210";
+        return `
+          <tr>
+            <td>#${u.id}</td>
+            <td><b>${u.full_name}</b></td>
+            <td><span class="badge badge-tech">${rollNo}</span></td>
+            <td>${u.email}</td>
+            <td>
+              <button class="phone-btn" onclick="copyPhone('${phone}')" title="Click to copy">📞 ${phone}</button>
+            </td>
+            <td><span class="badge badge-${u.role === 'admin' ? 'hackathon' : (u.role === 'faculty' ? 'workshop' : 'tech')}">${u.role.toUpperCase()}</span></td>
+            <td>${u.department}</td>
+            <td>
+              <button onclick="deleteUser(${u.id})" class="btn btn-danger btn-sm">Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    window.copyPhone = function(phone) {
+      navigator.clipboard.writeText(phone);
+      APIClient.showToast(`Copied ${phone} to clipboard!`, 'info');
+    };
+
+    async function submitQrCheckin() {
+      const event_id = parseInt(document.getElementById('qr-event-select').value);
+      const qr_token = document.getElementById('qr-token-input').value.trim();
+
+      if (!qr_token) {
+        APIClient.showToast('Please enter or scan a valid QR token', 'error');
+        return;
+      }
+
+      try {
+        const res = await APIClient.request('/api/attendance/checkin', {
+          method: 'POST',
+          body: JSON.stringify({ event_id, qr_token })
+        });
+        APIClient.showToast(`Checked in ${res.user_name}! Certificate generated.`, 'success');
+        document.getElementById('qr-token-input').value = '';
+      } catch (err) {
+        APIClient.showToast(err.message, 'error');
+      }
+    }
+
+    async function deleteAdminEvent(id) {
+      if (!confirm('Delete event permanently?')) return;
+      try {
+        await APIClient.request(`/api/events/${id}`, { method: 'DELETE' });
+        APIClient.showToast('Event deleted', 'info');
+        loadAdminEvents();
+      } catch (err) { APIClient.showToast(err.message, 'error'); }
+    }
+
+    async function deleteUser(id) {
+      if (!confirm('Delete user account?')) return;
+      try {
+        await APIClient.request(`/api/admin/users/${id}`, { method: 'DELETE' });
+        APIClient.showToast('User deleted', 'info');
+        loadAdminUsers();
+      } catch (err) { APIClient.showToast(err.message, 'error'); }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register – Campus Event Pro</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">Campus Event Pro</a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="events.html" class="nav-link">Events</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="login.html" class="btn btn-secondary btn-sm">Log In</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="auth-wrapper">
+    <div class="auth-card" style="max-width: 520px;">
+      <div class="auth-header">
+        <h2>Create Account</h2>
+        <p>Join Campus Event Pro platform as a Student or Teacher Coordinator</p>
+      </div>
+
+      <form id="register-form">
+        <div class="form-group">
+          <label class="form-label">Register As</label>
+          <div class="role-selector">
+            <div class="role-option active" onclick="selectRole('student', this)">Student</div>
+            <div class="role-option" onclick="selectRole('teacher_coordinator', this)">Teacher Coordinator</div>
+          </div>
+          <input type="hidden" id="reg-role" name="role" value="student" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-name">Full Name</label>
+          <input type="text" id="reg-name" name="full_name" class="form-control" placeholder="e.g. Prof. Jordan Lee" required />
+        </div>
+
+        <!-- Employee ID field (shown only for Teacher Coordinator) -->
+        <div class="form-group" id="emp-id-group" style="display: none;">
+          <label class="form-label" for="reg-emp-id">Employee ID</label>
+          <input type="text" id="reg-emp-id" name="employee_id" class="form-control" placeholder="e.g. EMP-2026-042" />
+        </div>
+
+        <!-- Roll Number field (shown for Student) -->
+        <div class="form-group" id="roll-group">
+          <label class="form-label" for="reg-roll">Roll Number</label>
+          <input type="text" id="reg-roll" name="roll_number" class="form-control" placeholder="e.g. CS2026-042" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-email">Email Address</label>
+          <input type="email" id="reg-email" name="email" class="form-control" placeholder="jordan@campuseventpro.edu" required />
+        </div>
+
+        <!-- Phone Number field (shown for Teacher Coordinator) -->
+        <div class="form-group" id="phone-group" style="display: none;">
+          <label class="form-label" for="reg-phone">Phone Number</label>
+          <input type="tel" id="reg-phone" name="phone" class="form-control" placeholder="e.g. 9876543210" pattern="[0-9]{10}" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-dept">Department</label>
+          <select id="reg-dept" name="department" class="form-control" required>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Information Technology">Information Technology</option>
+            <option value="Mechanical Engineering">Mechanical Engineering</option>
+            <option value="Electrical Engineering">Electrical Engineering</option>
+            <option value="Business Administration">Business Administration</option>
+            <option value="Physics & Mathematics">Physics & Mathematics</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-password">Password</label>
+          <input type="password" id="reg-password" name="password" class="form-control" placeholder="••••••••" required />
+        </div>
+
+        <!-- Confirm Password field (shown for Teacher Coordinator) -->
+        <div class="form-group" id="confirm-pw-group" style="display: none;">
+          <label class="form-label" for="reg-confirm-password">Confirm Password</label>
+          <input type="password" id="reg-confirm-password" name="confirm_password" class="form-control" placeholder="••••••••" />
+        </div>
+
+        <div id="teacher-note" style="display: none; font-size: 0.85rem; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem;">
+          ℹ️ <b>Note:</b> Teacher Coordinator registrations require Admin approval before you can log in.
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:1.25rem;">Register Account</button>
+      </form>
+
+      <p class="auth-footer-text">
+        Already have an account? <a href="login.html">Log In</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Redirect if admin registration url is hit
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('role') === 'admin') {
+      window.location.href = 'login.html';
+    }
+
+    function selectRole(role, el) {
+      document.querySelectorAll('.role-option').forEach(opt => opt.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('reg-role').value = role;
+
+      const empGroup = document.getElementById('emp-id-group');
+      const rollGroup = document.getElementById('roll-group');
+      const phoneGroup = document.getElementById('phone-group');
+      const confirmPwGroup = document.getElementById('confirm-pw-group');
+      const teacherNote = document.getElementById('teacher-note');
+
+      if (role === 'teacher_coordinator') {
+        empGroup.style.display = 'block';
+        phoneGroup.style.display = 'block';
+        confirmPwGroup.style.display = 'block';
+        teacherNote.style.display = 'block';
+        rollGroup.style.display = 'none';
+      } else {
+        empGroup.style.display = 'none';
+        phoneGroup.style.display = 'none';
+        confirmPwGroup.style.display = 'none';
+        teacherNote.style.display = 'none';
+        rollGroup.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>
