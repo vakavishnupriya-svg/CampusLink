@@ -5,10 +5,10 @@ from fastapi import APIRouter, Depends, HTTPException, status, Response, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
 
-from backend.database import get_db
-from backend.models import User, Event, EventRegistration, Certificate, Attendance, TeacherCoordinator
-from backend.schemas import AnalyticsResponse, UserResponse, RegistrationResponse, TeacherCoordinatorResponse, TeacherStatusUpdate, EventAssignCoordinator
-from backend.auth import require_admin
+from database import get_db
+from models import User, Event, EventRegistration, Certificate, Attendance, TeacherCoordinator
+from schemas import AnalyticsResponse, UserResponse, RegistrationResponse, TeacherCoordinatorResponse, TeacherStatusUpdate, EventAssignCoordinator
+from auth import require_admin
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
