@@ -4,12 +4,11 @@ import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
-from backend.database import get_db
-from backend.models import Attendance, Event, User, EventRegistration, Certificate, Notification
-from backend.schemas import AttendanceCheckinRequest, AttendanceResponse
-from backend.auth import get_current_user, require_faculty_or_admin
-from backend.utils.pdf_generator import generate_pdf_certificate
-
+from database import get_db
+from models import Attendance, Event, User, EventRegistration, Certificate, Notification
+from schemas import AttendanceCheckinRequest, AttendanceResponse
+from auth import get_current_user, require_faculty_or_admin
+from utils.pdf_generator import generate_pdf_certificate
 router = APIRouter(prefix="/api/attendance", tags=["Attendance"])
 
 @router.post("/checkin", response_model=AttendanceResponse)
