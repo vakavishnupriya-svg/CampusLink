@@ -4,11 +4,11 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from backend.config import settings
-from backend.database import engine, Base, SessionLocal
-from backend.models import User, Event, EventRegistration, Bookmark, Notification, Certificate, Attendance, TeacherCoordinator
-from backend.security import hash_password
-from backend.routes import auth, users, events, calendar, notifications, attendance, certificates, admin, registrations
+from config import settings
+from database import engine, Base, SessionLocal
+from models import User, Event, EventRegistration, Bookmark, Notification, Certificate, Attendance, TeacherCoordinator
+from security import hash_password
+from routes import auth, users, events, calendar, notifications, attendance, certificates, admin, registrations
 
 from sqlalchemy import inspect, text
 
