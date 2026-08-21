@@ -10,34 +10,50 @@
   <link rel="stylesheet" href="css/responsive.css">
   <style>
     .admin-layout {
-      display: grid;
-      grid-template-columns: 240px 1fr;
-      gap: 1.5rem;
-      margin: 2rem 0;
+      display: grid !important;
+      grid-template-columns: 250px 1fr !important;
+      gap: 1.5rem !important;
+      margin: 2rem 0 !important;
+      align-items: start !important;
+      width: 100% !important;
     }
     .admin-sidebar {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+      background: var(--bg-card) !important;
+      border: 1px solid var(--border-glow, rgba(99, 102, 241, 0.2)) !important;
+      border-radius: var(--radius-lg) !important;
+      padding: 1.25rem !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.5rem !important;
+      width: 250px !important;
+      min-width: 250px !important;
+      max-width: 250px !important;
+      flex-shrink: 0 !important;
+      position: sticky !important;
+      top: 90px !important;
+      height: fit-content !important;
+      visibility: visible !important;
+      opacity: 1 !important;
     }
     .admin-nav-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem 1rem;
-      border-radius: var(--radius-md);
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: var(--transition);
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      padding: 0.75rem 1rem !important;
+      border-radius: var(--radius-md) !important;
+      border: 1px solid transparent !important;
+      color: var(--text-muted) !important;
+      font-weight: 600 !important;
+      font-size: 0.9rem !important;
+      transition: all 0.2s ease !important;
+      text-decoration: none !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
     }
     .admin-nav-item:hover, .admin-nav-item.active {
-      background: var(--primary-light);
-      color: var(--primary);
+      background: rgba(99, 102, 241, 0.15) !important;
+      color: #818cf8 !important;
+      border-color: rgba(99, 102, 241, 0.3) !important;
     }
   </style>
 </head>

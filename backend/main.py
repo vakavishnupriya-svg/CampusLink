@@ -8,7 +8,7 @@ from config import settings
 from database import engine, Base, SessionLocal
 from models import User, Event, EventRegistration, Bookmark, Notification, Certificate, Attendance, TeacherCoordinator
 from security import hash_password
-from routes import auth, users, events, calendar, notifications, attendance, certificates, admin, registrations
+from routes import auth, users, events, calendar, notifications, attendance, certificates, admin, registrations, dashboard
 
 from sqlalchemy import inspect, text
 
@@ -19,6 +19,11 @@ with engine.connect() as conn:
         columns = [c["name"] for c in inspector.get_columns("events")]
         if "coordinator_id" not in columns:
             conn.execute(text("ALTER TABLE events ADD COLUMN coordinator_id INTEGER REFERENCES teacher_coordinators(id)"))
+            conn.commit()
+    if "users" in inspector.get_table_names():
+        columns = [c["name"] for c in inspector.get_columns("users")]
+        if "phone" not in columns:
+            conn.execute(text("ALTER TABLE users ADD COLUMN phone VARCHAR(20)"))
             conn.commit()
 
 Base.metadata.create_all(bind=engine)
@@ -64,6 +69,7 @@ app.include_router(attendance.router)
 app.include_router(certificates.router)
 app.include_router(admin.router)
 app.include_router(registrations.router)
+app.include_router(dashboard.router)
 
 @app.get("/api/health")
 def health_check():

@@ -13,6 +13,7 @@ class User(Base):
     role = Column(String(20), default="student", nullable=False)  # 'student', 'faculty', 'admin'
     department = Column(String(100), default="Computer Science")
     roll_number = Column(String(50), nullable=True)
+    phone = Column(String(20), nullable=True)
     avatar_url = Column(String(255), nullable=True)
     bio = Column(Text, nullable=True)
     is_active = Column(Boolean, default=True)

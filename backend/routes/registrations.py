@@ -2,7 +2,7 @@ import uuid
 import datetime
 import io
 import csv
-from typing import Optional
+from typing import Optional, Any
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
@@ -11,6 +11,7 @@ from pydantic import BaseModel, EmailStr, Field
 from database import get_db
 from models import Event, EventRegistration, User
 from utils.qr_generator import generate_qr_code_file
+from auth import get_optional_user
 
 router = APIRouter(prefix="/api/registrations", tags=["Registrations"])
 
@@ -36,7 +37,7 @@ def create_registration(payload: RegistrationPayload, db: Session = Depends(get_
     ).first()
 
     if existing:
-        return {"success": False, "message": "You have already registered."}
+        return {"success": False, "message": "You have already registered for this event"}
 
     # 3. Create registration
     reg_uuid = f"REG-2026-{uuid.uuid4().hex[:6].upper()}"
@@ -92,9 +93,18 @@ def get_registrations(
     size: int = 10,
     sortBy: str = "registered_at",
     sortDir: str = "desc",
+    current_user: Optional[Any] = Depends(get_optional_user),
     db: Session = Depends(get_db)
 ):
     query = db.query(EventRegistration)
+
+    # Restrict teacher coordinators to their assigned events only
+    if current_user and getattr(current_user, "role", None) == "teacher_coordinator":
+        teacher_events = db.query(Event.id).filter(Event.coordinator_id == current_user.id).all()
+        event_ids = [e[0] for e in teacher_events]
+        if getattr(current_user, "assigned_event_id", None):
+            event_ids.append(current_user.assigned_event_id)
+        query = query.filter(EventRegistration.event_id.in_(event_ids))
 
     if eventId:
         query = query.filter(EventRegistration.event_id == eventId)

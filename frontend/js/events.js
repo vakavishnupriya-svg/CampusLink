@@ -109,7 +109,10 @@ function renderEvents(events) {
             <a href="event-details.html?id=${ev.id}" class="btn btn-secondary btn-sm" style="flex:1;">Details</a>
             ${ev.is_user_registered
               ? `<button class="btn btn-outline btn-sm" disabled style="opacity:0.7;">Registered ✓</button>`
-              : `<button id="btn-register-${ev.id}" onclick="openRegistrationModal(${ev.id}, \`${ev.title.replace(/`/g, '\\`')}\`)" class="btn btn-primary btn-sm" style="flex:1;">Register</button>`
+              : (ev.seats_taken >= ev.capacity
+                  ? `<button class="btn btn-secondary btn-sm" disabled style="opacity:0.65; cursor:not-allowed; background:rgba(239, 68, 68, 0.2); color:#ef4444; border:1px solid #ef4444;">Event Full</button>`
+                  : `<button id="btn-register-${ev.id}" onclick="openRegistrationModal(${ev.id}, \`${ev.title.replace(/`/g, '\\`')}\`)" class="btn btn-primary btn-sm" style="flex:1;">Register</button>`
+                )
             }
           </div>
         </div>

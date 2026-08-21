@@ -9,7 +9,7 @@ class UserBase(BaseModel):
     role: str = "student"
     department: str = "Computer Science"
     roll_number: Optional[str] = None
-    phone: Optional[str] = "+91 9876543210"
+    phone: Optional[str] = None
     bio: Optional[str] = None
 
 class UserCreate(UserBase):
@@ -36,8 +36,8 @@ class UserPasswordConfirm(BaseModel):
 
 class UserResponse(UserBase):
     id: int
-    roll_number: Optional[str] = "CSE2026-001"
-    phone: Optional[str] = "+91 9876543210"
+    roll_number: Optional[str] = None
+    phone: Optional[str] = None
     avatar_url: Optional[str] = None
     is_active: bool
     created_at: datetime.datetime

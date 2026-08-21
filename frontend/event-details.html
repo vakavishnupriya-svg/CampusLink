@@ -202,9 +202,11 @@
               ${ev.is_user_registered ? `
                 <button onclick="showTicketModal()" class="btn btn-primary" style="width:100%; margin-bottom:0.75rem;">🎟️ View QR Entry Ticket</button>
                 <button onclick="leaveEvent()" class="btn btn-outline btn-sm" style="width:100%;">Unregister from Event</button>
+              ` : (ev.seats_taken >= ev.capacity ? `
+                <button class="btn btn-secondary" disabled style="width:100%; opacity:0.65; cursor:not-allowed; background:rgba(239, 68, 68, 0.2); color:#ef4444; border:1px solid #ef4444;">Event Full</button>
               ` : `
                 <button id="btn-register-${ev.id}" onclick="openRegistrationModal(${ev.id}, \`${ev.title.replace(/`/g, '\\`')}\`)" class="btn btn-primary" style="width:100%;">Register Now & Get Ticket</button>
-              `}
+              `)}
             </div>
           </aside>
         </div>

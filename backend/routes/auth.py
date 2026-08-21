@@ -21,21 +21,41 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
             detail="Admin registration is disabled. Admin accounts must be created manually in the database."
         )
 
-    existing = db.query(User).filter(User.email == user_in.email.lower()).first()
-    if existing:
+    email = user_in.email.lower().strip()
+    existing_email = db.query(User).filter(User.email == email).first()
+    if existing_email:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User with this email already exists"
         )
     
+    roll_no = user_in.roll_number.strip() if user_in.roll_number else None
+    if roll_no:
+        existing_roll = db.query(User).filter(User.roll_number == roll_no).first()
+        if existing_roll:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User with this Roll Number already exists"
+            )
+
+    clean_phone = user_in.phone.strip() if user_in.phone else None
+    if clean_phone:
+        import re
+        digits_only = re.sub(r'\D', '', clean_phone)
+        if len(digits_only) == 12 and digits_only.startswith("91"):
+            digits_only = digits_only[2:]
+        if len(digits_only) == 10:
+            clean_phone = f"+91 {digits_only}"
+
     hashed_pw = hash_password(user_in.password)
     user = User(
-        full_name=user_in.full_name,
-        email=user_in.email.lower(),
+        full_name=user_in.full_name.strip(),
+        email=email,
         hashed_password=hashed_pw,
         role=user_in.role.lower() if user_in.role.lower() in ["student", "faculty"] else "student",
         department=user_in.department,
-        roll_number=user_in.roll_number,
+        roll_number=roll_no,
+        phone=clean_phone,
         bio=user_in.bio
     )
     db.add(user)

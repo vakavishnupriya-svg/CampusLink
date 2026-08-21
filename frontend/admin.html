@@ -11,42 +11,75 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     .admin-layout {
-      display: grid;
-      grid-template-columns: 240px 1fr;
-      gap: 1.5rem;
-      margin: 2rem 0;
+      display: flex !important;
+      min-height: 100vh !important;
+      width: 100% !important;
     }
     .admin-sidebar {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+      width: 260px !important;
+      min-width: 260px !important;
+      max-width: 260px !important;
+      position: sticky !important;
+      top: 70px !important;
+      height: calc(100vh - 70px) !important;
+      overflow-y: auto !important;
+      flex-shrink: 0 !important;
+      background: var(--bg-card) !important;
+      border-right: 1px solid var(--border-color) !important;
+      padding: 1.25rem !important;
+      box-sizing: border-box !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.5rem !important;
     }
     .admin-tab-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1rem;
-      border-radius: var(--radius-md);
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: var(--transition);
-      text-align: left;
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.75rem !important;
+      padding: 0.75rem 1rem !important;
+      border-radius: var(--radius-md) !important;
+      border: 1px solid transparent !important;
+      background: transparent !important;
+      color: var(--text-muted) !important;
+      font-weight: 600 !important;
+      font-size: 0.9rem !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      text-align: left !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
     }
     .admin-tab-btn.active, .admin-tab-btn:hover {
-      background: var(--primary-light);
-      color: var(--primary);
+      background: rgba(99, 102, 241, 0.15) !important;
+      color: #818cf8 !important;
+      border-color: rgba(99, 102, 241, 0.3) !important;
+    }
+    .admin-main {
+      flex: 1 !important;
+      padding: 24px !important;
+      overflow-x: auto !important;
+      box-sizing: border-box !important;
+      width: calc(100% - 260px) !important;
+    }
+    @media (max-width: 768px) {
+      .admin-layout {
+        flex-direction: column !important;
+      }
+      .admin-sidebar {
+        position: relative !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        top: 0 !important;
+      }
+      .admin-main {
+        width: 100% !important;
+        padding: 16px !important;
+      }
     }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-
     .phone-btn {
       background: rgba(99, 102, 241, 0.15);
       border: 1px solid var(--border-glow);
@@ -82,22 +115,21 @@
     </div>
   </nav>
 
-  <main class="container">
-    <div class="admin-layout">
-      <!-- Admin Sidebar -->
-      <aside class="admin-sidebar">
-        <h3 style="font-size:1.1rem; margin-bottom:0.75rem; color:var(--text-main);">🛡️ Admin Panel</h3>
-        <button class="admin-tab-btn active" onclick="switchAdminTab('tab-dashboard', this)">📊 Dashboard</button>
-        <button class="admin-tab-btn" onclick="switchAdminTab('tab-events', this)">📅 Events CRUD</button>
-        <button class="admin-tab-btn" onclick="switchAdminTab('tab-teachers', this)">👨‍🏫 Teacher Coordinators</button>
-        <button class="admin-tab-btn" onclick="switchAdminTab('tab-users', this)">👥 Students & Users</button>
-        <a href="admin-registrations.html" class="admin-tab-btn" style="text-decoration:none;">📋 Registrations</a>
-        <button class="admin-tab-btn" onclick="switchAdminTab('tab-attendance', this)">📱 QR Check-in</button>
-        <button class="admin-tab-btn" onclick="switchAdminTab('tab-reports', this)">📄 Export Reports</button>
-      </aside>
+  <div class="admin-layout">
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar">
+      <h3 style="font-size:1.1rem; margin-bottom:0.75rem; color:var(--text-main);">🛡️ Admin Panel</h3>
+      <button class="admin-tab-btn active" onclick="switchAdminTab('tab-dashboard', this)">📊 Dashboard</button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('tab-events', this)">📅 Events CRUD</button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('tab-teachers', this)">👨‍🏫 Teacher Coordinators</button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('tab-users', this)">👥 Students & Users</button>
+      <a href="admin-registrations.html" class="admin-tab-btn" style="text-decoration:none;">📋 Registrations</a>
+      <button class="admin-tab-btn" onclick="switchAdminTab('tab-attendance', this)">📱 QR Check-in</button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('tab-reports', this)">📄 Export Reports</button>
+    </aside>
 
-      <!-- Main Admin Content Area -->
-      <section>
+    <!-- Main Admin Content Area -->
+    <main class="admin-main">
         <!-- Tab 1: Analytics Dashboard -->
         <div id="tab-dashboard" class="tab-content active">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">

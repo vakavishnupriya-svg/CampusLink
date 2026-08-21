@@ -26,25 +26,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadDashboardData(user) {
   try {
+    const stats = await APIClient.request('/api/dashboard/stats').catch(() => null);
     const events = await APIClient.request('/api/events');
     const myRegistrations = events.filter(e => e.is_user_registered);
-    const certificates = user.role === 'student' ? await APIClient.request('/api/certificates').catch(() => []) : [];
-    
-    // Date Calculations for counters
-    const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
 
-    const upcomingEvents = events.filter(e => new Date(e.start_time) > now);
-    const todaysEvents = events.filter(e => e.start_time.startsWith(todayStr));
-    const totalRegistrations = events.reduce((sum, e) => sum + e.seats_taken, 0);
-
-    // Update Counter Widgets
-    document.getElementById('stat-total-events').textContent = events.length;
-    document.getElementById('stat-upcoming-events').textContent = upcomingEvents.length;
-    document.getElementById('stat-todays-events').textContent = todaysEvents.length;
-    document.getElementById('stat-joined-events').textContent = myRegistrations.length;
-    document.getElementById('stat-qr-count').textContent = totalRegistrations;
-    document.getElementById('stat-certificates').textContent = certificates.length;
+    // Update Counter Widgets using live database data
+    if (stats) {
+      if (document.getElementById('stat-total-students')) document.getElementById('stat-total-students').textContent = stats.total_students;
+      if (document.getElementById('stat-total-teachers')) document.getElementById('stat-total-teachers').textContent = stats.total_teachers;
+      if (document.getElementById('stat-total-events')) document.getElementById('stat-total-events').textContent = stats.total_events;
+      if (document.getElementById('stat-total-registrations')) document.getElementById('stat-total-registrations').textContent = stats.total_registrations;
+      if (document.getElementById('stat-upcoming-events')) document.getElementById('stat-upcoming-events').textContent = stats.upcoming_events;
+      if (document.getElementById('stat-recent-registrations-count')) document.getElementById('stat-recent-registrations-count').textContent = stats.recent_registrations.length;
+    } else {
+      const now = new Date();
+      document.getElementById('stat-total-events').textContent = events.length;
+      document.getElementById('stat-upcoming-events').textContent = events.filter(e => new Date(e.start_time) > now).length;
+      document.getElementById('stat-total-registrations').textContent = events.reduce((sum, e) => sum + e.seats_taken, 0);
+    }
 
     // Render Registered Tickets List
     const joinedList = document.getElementById('joined-events-list');
@@ -69,27 +68,48 @@ async function loadDashboardData(user) {
       }
     }
 
-    // Initialize Chart.js Analytics
-    renderDashboardCharts(events);
+    // Render Recent Activity Feed with actual recent registrations
+    const activityFeed = document.getElementById('activity-feed-container');
+    if (activityFeed && stats && stats.recent_registrations && stats.recent_registrations.length > 0) {
+      activityFeed.innerHTML = `
+        <div class="glass-card" style="padding:1rem;">
+          ${stats.recent_registrations.map(r => `
+            <div class="ticket-item" style="margin-bottom:0.5rem; padding:0.6rem; background:rgba(255,255,255,0.03); border-radius:6px;">
+              <div class="ticket-info">
+                <h4 style="font-size:0.95rem;">👤 ${r.full_name} <small style="color:var(--text-muted);">(${r.roll_no})</small></h4>
+                <p style="font-size:0.8rem; color:var(--primary);">Registered for <b>${r.event_name}</b></p>
+                <small style="font-size:0.75rem; color:var(--text-muted);">${r.registered_at ? new Date(r.registered_at).toLocaleString() : ''}</small>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // Initialize Chart.js Analytics using live database data
+    renderDashboardCharts(events, stats);
 
   } catch (err) {
     console.error("Dashboard error:", err);
   }
 }
 
-function renderDashboardCharts(events) {
-  // Monthly Registration Trend Bar Chart
+function renderDashboardCharts(events, stats) {
+  // Monthly Registration Trend Bar Chart (Live DB Data)
   const ctxMonthly = document.getElementById('chart-monthly-registrations')?.getContext('2d');
   if (ctxMonthly && typeof Chart !== 'undefined') {
     if (monthlyChartInstance) monthlyChartInstance.destroy();
 
+    const monthlyLabels = stats && stats.monthly_registrations ? stats.monthly_registrations.map(m => m.month) : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthlyCounts = stats && stats.monthly_registrations ? stats.monthly_registrations.map(m => m.count) : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
     monthlyChartInstance = new Chart(ctxMonthly, {
       type: 'bar',
       data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+        labels: monthlyLabels,
         datasets: [{
           label: 'Event Registrations',
-          data: [65, 120, 95, 150, 210, 180, 240, 310],
+          data: monthlyCounts,
           backgroundColor: 'rgba(99, 102, 241, 0.7)',
           borderColor: '#6366f1',
           borderWidth: 2,
@@ -108,25 +128,32 @@ function renderDashboardCharts(events) {
     });
   }
 
-  // Department Distribution Doughnut Chart
+  // Department Distribution Doughnut Chart (Live DB Data)
   const ctxDept = document.getElementById('chart-department-events')?.getContext('2d');
   if (ctxDept && typeof Chart !== 'undefined') {
     if (deptChartInstance) deptChartInstance.destroy();
 
-    const deptCounts = {};
-    events.forEach(e => {
-      deptCounts[e.department] = (deptCounts[e.department] || 0) + 1;
-    });
+    let labels = [];
+    let data = [];
 
-    const labels = Object.keys(deptCounts);
-    const data = Object.values(deptCounts);
+    if (stats && stats.department_stats && stats.department_stats.length > 0) {
+      labels = stats.department_stats.map(d => d.department);
+      data = stats.department_stats.map(d => d.count);
+    } else {
+      const deptCounts = {};
+      events.forEach(e => {
+        deptCounts[e.department] = (deptCounts[e.department] || 0) + 1;
+      });
+      labels = Object.keys(deptCounts);
+      data = Object.values(deptCounts);
+    }
 
     deptChartInstance = new Chart(ctxDept, {
       type: 'doughnut',
       data: {
-        labels: labels.length ? labels : ['CS', 'IT', 'Cultural', 'Sports'],
+        labels: labels.length ? labels : ['Computer Science', 'Information Technology', 'Electrical Engineering'],
         datasets: [{
-          data: data.length ? data : [4, 3, 2, 2],
+          data: data.length ? data : [1, 1, 1],
           backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#0ea5e9'],
           borderWidth: 2,
           borderColor: '#0f172a'

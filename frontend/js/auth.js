@@ -165,19 +165,30 @@ class AuthManager {
         } else {
           const full_name = document.getElementById('reg-name')?.value.trim();
           const email = document.getElementById('reg-email')?.value.trim();
+          const phone = document.getElementById('reg-phone')?.value.trim();
           const department = document.getElementById('reg-dept')?.value;
           const roll_number = document.getElementById('reg-roll')?.value.trim();
           const password = document.getElementById('reg-password')?.value;
 
+          if (!full_name || !email || !phone || !roll_number || !password) {
+            APIClient.showToast('Please fill out all required fields: Full Name, Email, Phone Number, Roll Number, and Password.', 'error');
+            return;
+          }
+
+          if (phone.length !== 10 || isNaN(phone)) {
+            APIClient.showToast('Phone number must contain exactly 10 digits.', 'error');
+            return;
+          }
+
           try {
             const res = await APIClient.request('/api/auth/register', {
               method: 'POST',
-              body: JSON.stringify({ full_name, email, password, role: 'student', department, roll_number })
+              body: JSON.stringify({ full_name, email, phone, password, role: 'student', department, roll_number })
             });
 
             APIClient.setToken(res.access_token);
             APIClient.setUser(res.user);
-            APIClient.showToast('Account created successfully!', 'success');
+            APIClient.showToast('Registration successful', 'success');
             setTimeout(() => window.location.href = 'dashboard.html', 600);
           } catch (err) {
             APIClient.showToast(err.message, 'error');

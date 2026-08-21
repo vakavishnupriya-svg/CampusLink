@@ -79,7 +79,7 @@ def test_event_registration_api():
         assert dup_res.status_code == 201 or dup_res.status_code == 200 or dup_res.status_code == 400
         dup_data = dup_res.json()
         assert dup_data["success"] is False
-        assert dup_data["message"] == "You have already registered."
+        assert "You have already registered" in dup_data["message"]
 
         # 3. Verify Seat Occupancy Incremented
         event_check = client.get(f"/api/events/{target_event_id}").json()
@@ -145,4 +145,55 @@ def test_teacher_coordinator_flow():
         ev = client.get("/api/events/1").json()
         assert ev["coordinator_id"] == new_teacher['id']
         assert ev["coordinator_name"] == f"Prof. {uid}"
+
+
+def test_dashboard_stats_api():
+    with TestClient(app) as client:
+        res = client.get("/api/dashboard/stats")
+        assert res.status_code == 200
+        stats = res.json()
+        assert "total_students" in stats
+        assert "total_teachers" in stats
+        assert "total_events" in stats
+        assert "total_registrations" in stats
+        assert "upcoming_events" in stats
+        assert "recent_registrations" in stats
+        assert isinstance(stats["recent_registrations"], list)
+
+
+def test_student_registration_fields_and_duplicates():
+    with TestClient(app) as client:
+        uid = uuid.uuid4().hex[:6].upper()
+        email = f"student.{uid.lower()}@campuseventpro.edu"
+        roll = f"ROLL-{uid}"
+        phone = "9876543210"
+
+        # 1. Register student
+        reg = client.post("/api/auth/register", json={
+            "full_name": f"Student {uid}",
+            "email": email,
+            "phone": phone,
+            "password": "password123",
+            "role": "student",
+            "department": "Computer Science",
+            "roll_number": roll
+        })
+        assert reg.status_code == 201
+        data = reg.json()
+        assert data["user"]["email"] == email
+        assert data["user"]["roll_number"] == roll
+        assert data["user"]["phone"] == "+91 9876543210"
+
+        # 2. Duplicate Roll Number test
+        dup_roll = client.post("/api/auth/register", json={
+            "full_name": "Another Student",
+            "email": f"other.{uid.lower()}@campuseventpro.edu",
+            "phone": "9876543211",
+            "password": "password123",
+            "role": "student",
+            "department": "Computer Science",
+            "roll_number": roll
+        })
+        assert dup_roll.status_code == 400
+        assert "Roll Number" in dup_roll.json()["detail"]
 

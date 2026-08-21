@@ -255,7 +255,7 @@ def register_for_event(
         raise HTTPException(status_code=404, detail="Event not found")
 
     if ev.seats_taken >= ev.capacity:
-        raise HTTPException(status_code=400, detail="Event is at full capacity")
+        raise HTTPException(status_code=400, detail="Event is full")
 
     full_name = reg_req.full_name if reg_req else (current_user.full_name if current_user else "Student")
     roll_no = reg_req.roll_no if reg_req else (current_user.roll_number if current_user else "CSEIOT23045")
@@ -287,7 +287,7 @@ def register_for_event(
     ).first()
 
     if dup_query:
-        raise HTTPException(status_code=400, detail="You are already registered for this event!")
+        raise HTTPException(status_code=400, detail="You have already registered for this event")
 
     reg_id = f"REG-2026-{uuid.uuid4().hex[:6].upper()}"
     qr_token = f"CEP-{uuid.uuid4().hex[:12].upper()}"
@@ -392,3 +392,69 @@ def toggle_bookmark(
         db.add(new_bm)
         db.commit()
         return {"bookmarked": True, "message": "Event bookmarked"}
+
+
+@router.put("/{event_id}", response_model=EventResponse)
+def update_event(
+    event_id: int,
+    event_in: EventUpdate,
+    current_user: User = Depends(require_faculty_or_admin),
+    db: Session = Depends(get_db)
+):
+    ev = db.query(Event).filter(Event.id == event_id).first()
+    if not ev:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    update_data = event_in.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        if value is not None:
+            setattr(ev, field, value)
+
+    db.commit()
+    db.refresh(ev)
+
+    organizer_name = ev.organizer.full_name if ev.organizer else "Campus Event Pro Admin"
+    coord_name = ev.coordinator.name if ev.coordinator else None
+    coord_dept = ev.coordinator.department if ev.coordinator else None
+
+    return EventResponse(
+        id=ev.id,
+        title=ev.title,
+        description=ev.description,
+        category=ev.category,
+        department=ev.department,
+        organizer_id=ev.organizer_id,
+        organizer_name=organizer_name,
+        coordinator_id=ev.coordinator_id,
+        coordinator_name=coord_name,
+        coordinator_department=coord_dept,
+        venue=ev.venue,
+        start_time=ev.start_time,
+        end_time=ev.end_time,
+        capacity=ev.capacity,
+        seats_taken=ev.seats_taken,
+        registration_deadline=ev.registration_deadline,
+        banner_url=ev.banner_url,
+        status=ev.status,
+        is_featured=ev.is_featured,
+        is_paid=ev.is_paid,
+        ticket_price=ev.ticket_price,
+        speaker_name=ev.speaker_name,
+        speaker_title=ev.speaker_title,
+        created_at=ev.created_at
+    )
+
+
+@router.delete("/{event_id}")
+def delete_event(
+    event_id: int,
+    current_user: User = Depends(require_faculty_or_admin),
+    db: Session = Depends(get_db)
+):
+    ev = db.query(Event).filter(Event.id == event_id).first()
+    if not ev:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    db.delete(ev)
+    db.commit()
+    return {"success": True, "message": "Event deleted successfully"}
