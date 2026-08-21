@@ -6,12 +6,12 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_
 
-from backend.database import get_db
-from backend.models import Event, User, EventRegistration, Bookmark, Notification, Certificate, Attendance
-from backend.schemas import EventCreate, EventResponse, EventUpdate, RegistrationResponse, EventRegistrationRequest
-from backend.auth import get_current_user, get_optional_user, require_faculty_or_admin
-from backend.utils.qr_generator import generate_qr_code_file, generate_qr_code_base64
-from backend.utils.pdf_generator import generate_pdf_certificate
+from database import get_db
+from models import Event, User, EventRegistration, Bookmark, Notification, Certificate, Attendance
+from schemas import EventCreate, EventResponse, EventUpdate, RegistrationResponse, EventRegistrationRequest
+from auth import get_current_user, get_optional_user, require_faculty_or_admin
+from utils.qr_generator import generate_qr_code_file, generate_qr_code_base64
+from utils.pdf_generator import generate_pdf_certificate
 
 router = APIRouter(prefix="/api/events", tags=["Events"])
 

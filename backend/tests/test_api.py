@@ -1,8 +1,7 @@
 import uuid
 import pytest
 from fastapi.testclient import TestClient
-from backend.main import app, seed_database
-
+from main import app, seed_database
 @pytest.fixture(autouse=True)
 def run_seed():
     seed_database()

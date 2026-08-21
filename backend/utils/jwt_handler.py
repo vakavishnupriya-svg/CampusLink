@@ -1,7 +1,7 @@
 import datetime
 import jwt
 from typing import Optional
-from backend.config import settings
+from config import settings
 
 def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] = None) -> str:
     to_encode = data.copy()

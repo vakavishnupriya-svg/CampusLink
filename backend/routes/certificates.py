@@ -4,10 +4,10 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 import os
 
-from backend.database import get_db
-from backend.models import Certificate, User, Event
-from backend.schemas import CertificateResponse
-from backend.auth import get_current_user
+from database import get_db
+from models import Certificate, User, Event
+from schemas import CertificateResponse
+from auth import get_current_user
 
 router = APIRouter(prefix="/api/certificates", tags=["Certificates"])
 

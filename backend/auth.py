@@ -2,9 +2,9 @@ from typing import Optional, Any
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from backend.database import get_db
-from backend.models import User, TeacherCoordinator
-from backend.utils.jwt_handler import decode_access_token
+from database import get_db
+from models import User, TeacherCoordinator
+from utils.jwt_handler import decode_access_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 

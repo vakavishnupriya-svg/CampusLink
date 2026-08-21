@@ -2,10 +2,10 @@ import datetime
 from typing import Optional, List
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from backend.database import get_db
-from backend.models import Event
-from backend.schemas import EventResponse
-from backend.auth import get_optional_user, User
+from database import get_db
+from models import Event
+from schemas import EventResponse
+from auth import get_optional_user, User
 
 router = APIRouter(prefix="/api/calendar", tags=["Calendar"])
 

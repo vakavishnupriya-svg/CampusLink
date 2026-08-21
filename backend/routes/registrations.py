@@ -8,9 +8,9 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr, Field
 
-from backend.database import get_db
-from backend.models import Event, EventRegistration, User
-from backend.utils.qr_generator import generate_qr_code_file
+from database import get_db
+from models import Event, EventRegistration, User
+from utils.qr_generator import generate_qr_code_file
 
 router = APIRouter(prefix="/api/registrations", tags=["Registrations"])
 
